@@ -1024,6 +1024,9 @@ DEFAULT_CONFIG = {
         "backend": "",           # shared fallback — applies to both search and extract
         "search_backend": "",    # per-capability override for web_search (e.g. "searxng")
         "extract_backend": "",   # per-capability override for web_extract (e.g. "native")
+        # Web UI: enable the embedded Web UI server and bind port (fixed).
+        "enable_ui": True,
+        "port": 8765,
     },
 
     "browser": {

@@ -1,0 +1,4 @@
+[console_scripts]
+jarvis = hermes_cli.main:main
+jarvis-acp = acp_adapter.entry:main
+jarvis-agent = run_agent:main

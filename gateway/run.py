@@ -6507,6 +6507,16 @@ class GatewayRunner(GatewayAuthorizationMixin, GatewayKanbanWatchersMixin, Gatew
                 return None
             return MatrixAdapter(config)
 
+        elif platform == Platform.JARVIS:
+            # Built-in small adapter that links the web UI to the gateway.
+            from gateway.platforms.jarvis_platform import JarvisPlatformAdapter, check_jarvis_requirements
+            if not check_jarvis_requirements():
+                logger.warning("Jarvis platform: requirements not met")
+                return None
+            adapter = JarvisPlatformAdapter(config)
+            adapter.gateway_runner = self
+            return adapter
+
         elif platform == Platform.API_SERVER:
             from gateway.platforms.api_server import APIServerAdapter, check_api_server_requirements
             if not check_api_server_requirements():

@@ -182,6 +182,22 @@ _project_env = Path(__file__).parent / '.env'
 load_hermes_dotenv(hermes_home=_hermes_home, project_env=_project_env)
 
 
+def start_web_gateway(dev_mode: bool = False):
+    """Start the Jarvis Web Gateway in-process."""
+    try:
+        from gateway.web_gateway import run as _run_web_gateway
+    except Exception:
+        logger.exception("Failed to import gateway.web_gateway")
+        return
+
+    # Run the web gateway in a background thread so CLI remains interactive.
+    def _run():
+        _run_web_gateway(port=8765, host="127.0.0.1")
+
+    thread = threading.Thread(target=_run, daemon=True, name="web-gateway")
+    thread.start()
+
+
 _REASONING_TAGS = (
     "REASONING_SCRATCHPAD",
     "think",
@@ -7251,6 +7267,15 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin):
                 _cprint(f"  {_DIM}✗ Unknown argument: {_escape(_args)}. Use /exit --delete to also remove session history.{_RST}")
                 return True
             return False
+        elif canonical == "web":
+            # Start the Jarvis Web Gateway
+            _cprint(f"  {_DIM}Starting Jarvis Web Gateway on port 8765...{_RST}")
+            from gateway.web_gateway import run as run_web_gateway
+            try:
+                run_web_gateway(port=8765, host="127.0.0.1")
+            except KeyboardInterrupt:
+                _cprint(f"  {_DIM}Web gateway stopped.{_RST}")
+            return False
         elif canonical == "help":
             self.show_help()
         elif canonical == "profile":
@@ -13551,7 +13576,7 @@ def main(
     if gateway:
         import asyncio
         from gateway.run import start_gateway
-        print("Starting Hermes Gateway (messaging platforms)...")
+        print("Starting Jarvis Gateway (messaging platforms)...")
         asyncio.run(start_gateway())
         return
 
